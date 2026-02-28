@@ -71,7 +71,4 @@ app.get('/', (req, res) => {
   res.send('Hello from the server!');
 });
 
-app.listen(PORT, async () => {
-    console.log(`Server is running on port ${PORT}`);
-}
-)
+export default app;
