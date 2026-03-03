@@ -4,7 +4,12 @@ import { body, validationResult } from "express-validator";
 import Admin from "../models/Admin.js";
 import Youth from "../models/Youth.js";
 import Complaint from "../models/Complaint.js";
-import auth from "../middleware/auth.js";
+import authenticate from "../middleware/auth.js";
+import Post from "../models/Post.js";
+
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const router = express.Router();
 
@@ -130,26 +135,21 @@ router.post(
 // @route   GET api/admin/verify
 // @desc    Verify admin token
 // @access  Private
-router.get("/verify", auth, async (req, res) => {
+
+
+router.get("/verify", authenticate, async (req, res, next) => {
   try {
-    const admin = await Admin.findById(req.admin.id).select("-password");
-    res.json({
-      success: true,
-      admin,
-    });
+    const admin = await Admin.findById(req.admin.id);
+    res.json(admin);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({
-      success: false,
-      error: err.message,
-    });
+    next(err); // sends error to global handler
   }
 });
 
 // @route   GET api/admin/youths
 // @desc    Get all registered youths
 // @access  Private
-router.get("/youths", auth, async (req, res) => {
+router.get("/youths", authenticate, async (req, res) => {
   try {
     const { page = 1, limit = 50, community, search } = req.query;
 
@@ -219,7 +219,7 @@ router.get("/youths", auth, async (req, res) => {
 // @route   GET api/admin/youths/:id
 // @desc    Get single youth by ID
 // @access  Private
-router.get("/youths/:id", auth, async (req, res) => {
+router.get("/youths/:id", authenticate, async (req, res) => {
   try {
     const youth = await Youth.findById(req.params.id);
     if (!youth) {
@@ -244,7 +244,7 @@ router.get("/youths/:id", auth, async (req, res) => {
 // @route   PUT api/admin/youths/:id
 // @desc    Update youth information
 // @access  Private
-router.put("/youths/:id", auth, async (req, res) => {
+router.put("/youths/:id", authenticate, async (req, res) => {
   try {
     const youth = await Youth.findByIdAndUpdate(
       req.params.id,
@@ -275,7 +275,7 @@ router.put("/youths/:id", auth, async (req, res) => {
 // @route   DELETE api/admin/youths/:id
 // @desc    Delete youth
 // @access  Private
-router.delete("/youths/:id", auth, async (req, res) => {
+router.delete("/youths/:id", authenticate, async (req, res) => {
   try {
     const youth = await Youth.findByIdAndDelete(req.params.id);
     if (!youth) {
@@ -300,7 +300,7 @@ router.delete("/youths/:id", auth, async (req, res) => {
 // @route   GET api/admin/complaints
 // @desc    Get all complaints
 // @access  Private
-router.get("/complaints", auth, async (req, res) => {
+router.get("/complaints", authenticate, async (req, res) => {
   try {
     const { status, priority, page = 1, limit = 50 } = req.query;
 
@@ -336,7 +336,7 @@ router.get("/complaints", auth, async (req, res) => {
 // @route   PUT api/admin/complaints/:id
 // @desc    Update complaint status
 // @access  Private
-router.put("/complaints/:id", auth, async (req, res) => {
+router.put("/complaints/:id", authenticate, async (req, res) => {
   try {
     const { status, response, priority } = req.body;
 
@@ -381,7 +381,7 @@ router.put("/complaints/:id", auth, async (req, res) => {
 // @route   GET api/admin/stats
 // @desc    Get dashboard statistics
 // @access  Private
-router.get("/stats", auth, async (req, res) => {
+router.get("/stats", authenticate, async (req, res) => {
   try {
     const [
       totalYouth,
@@ -394,7 +394,7 @@ router.get("/stats", auth, async (req, res) => {
       Youth.countDocuments(),
       Complaint.countDocuments(),
       Complaint.countDocuments({ status: "Pending" }),
-      require("../models/Post").countDocuments(),
+     Post.countDocuments(),
       Youth.find().sort({ dateJoined: -1 }).limit(5),
       Complaint.find().sort({ createdAt: -1 }).limit(5),
     ]);
@@ -418,5 +418,7 @@ router.get("/stats", auth, async (req, res) => {
     });
   }
 });
+
+console.log(typeof authenticate);
 
 export default router;
