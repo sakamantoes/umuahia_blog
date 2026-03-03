@@ -1,8 +1,37 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+    if (token && userData) {
+      setIsLoggedIn(true);
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setUser(null);
+    toast.success("Logged out successfully");
+    navigate("/");
+  };
+
   const categories = [
     { name: "News & Updates", path: "/posts/News & Updates" },
     { name: "Opportunities", path: "/posts/Opportunities" },
@@ -12,101 +41,144 @@ const Navbar = () => {
     { name: "Resources", path: "/posts/Resources" },
   ];
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
- 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   return (
-    <nav className="bg-blue-600 text-white p-4 relative">
-      <div className="container mx-auto flex items-center justify-between">
-        <Link to="/" className="md:text-2xl text-xl font-bold">
-          Umuahia South Youth
+    <nav className="bg-white p-4 relative z-50 border-b border-red-100">
+      <div className="container mx-auto flex justify-between items-center">
+        
+        {/* Logo */}
+        <Link to="/" className="text-xl sm:text-3xl text-red-500 font-bold">
+          Umuahia Youth
         </Link>
 
-        <div className="sm:flex md:flex hidden items-center space-x-4">
+        {/* Desktop Menu */}
+        <div className="hidden md:flex items-center space-x-6">
           {categories.map((cat) => (
-            <Link key={cat.name} to={cat.path} className="hover:text-blue-200 ">
+            <Link
+              key={cat.name}
+              to={cat.path}
+              className="text-gray-800 hover:text-red-500 transition font-semibold"
+            >
               {cat.name}
             </Link>
           ))}
-          <Link to="/youth" className="hover:text-blue-200">
+
+          <Link
+            to="/youth-directory"
+            className="text-gray-800 hover:text-red-500 transition ml-5 font-semibold"
+          >
             Youth Directory
           </Link>
-          <Link
-            to="/register"
-            className="bg-white text-blue-600 px-4 py-2 rounded"
-          >
-            Register
-          </Link>
-        </div>
 
-        <div className="md:hidden">
-          {isMenuOpen ? (
-            <X className="w-6 h-6 cursor-pointer" onClick={toggleMenu} />
+          {isLoggedIn ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-700 text-sm">
+                Hi, {user?.fullName?.split(" ")[0]}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+              >
+                Logout
+              </button>
+            </div>
           ) : (
-            <Menu className="w-6 h-6 cursor-pointer" onClick={toggleMenu} />
+            <div className="flex space-x-3">
+              <Link
+                to="/login"
+                className="border border-red-500 text-red-500 px-4 py-2 rounded hover:bg-red-50 transition"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+              >
+                Register
+              </Link>
+            </div>
           )}
         </div>
 
-        {/* Mobile Menu */}
-        {/* Overlay */}
-        {isMenuOpen && (
-          <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-500"
-            onClick={toggleMenu}
-          />
-        )}
-
-        {/* Mobile Glass SideNav */}
-        <div
-          className={`md:hidden fixed top-0 right-0 h-full w-80 
-  bg-white/10 backdrop-blur-xl border-l border-white/20 
-  shadow-2xl z-50 transform transition-all duration-500 ease-in-out
-  ${isMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
-  `}
-        >
-          <div className="p-6 flex justify-between items-center border-b border-white/20">
-            <h2 className="text-white font-bold text-lg">Menu</h2>
-            <X
-              className="w-6 h-6 cursor-pointer text-white"
-              onClick={toggleMenu}
-            />
-          </div>
-
-          <div className="flex flex-col space-y-2 mt-6 px-6">
-            {categories.map((cat) => (
-              <Link
-                key={cat.name}
-                to={cat.path}
-                onClick={() => setIsMenuOpen(false)}
-                className="text-white py-3 font-bold px-4 rounded-lg hover:bg-white/20 transition-all duration-300"
-              >
-                {cat.name}
-              </Link>
-            ))}
-
-            <div className="border-t border-white/20 my-4"></div>
-
-            <Link
-              to="/youth"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-white py-3 px-4 rounded-lg hover:bg-white/20 transition-all duration-300"
-            >
-              Youth Directory
-            </Link>
-
-            <Link
-              to="/register"
-              onClick={() => setIsMenuOpen(false)}
-              className="mt-4 bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 rounded-xl text-center font-semibold shadow-lg hover:scale-105 transition-all duration-300"
-            >
-              Register Now
-            </Link>
-          </div>
+        {/* Mobile Toggle */}
+        <div className="md:hidden">
+          {isOpen ? (
+            <X size={28} onClick={handleToggle} className="text-red-500 cursor-pointer" />
+          ) : (
+            <Menu size={28} onClick={handleToggle} className="text-red-500 cursor-pointer" />
+          )}
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.4 }}
+            className="fixed top-0 right-0 w-full sm:w-1/2 h-screen bg-white text-gray-800 shadow-lg md:hidden"
+          >
+            <X
+              size={28}
+              onClick={handleToggle}
+              className="cursor-pointer absolute top-4 left-4 text-red-500"
+            />
+
+            <div className="flex flex-col items-center justify-center h-full gap-8 text-lg font-semibold">
+              {categories.map((cat) => (
+                <Link
+                  key={cat.name}
+                  to={cat.path}
+                  onClick={handleToggle}
+                  className="hover:text-red-500 transition"
+                >
+                  {cat.name}
+                </Link>
+              ))}
+
+              <Link
+                to="/youth"
+                onClick={handleToggle}
+                className="hover:text-red-500 transition"
+              >
+                Youth Directory
+              </Link>
+
+              {isLoggedIn ? (
+                <div className="flex flex-col items-center gap-4">
+                  <span>
+                    Hi, {user?.fullName?.split(" ")[0]}
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <Link
+                    to="/login"
+                    onClick={handleToggle}
+                    className="border border-red-500 text-red-500 px-6 py-2 rounded text-center hover:bg-red-50 transition"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={handleToggle}
+                    className="bg-red-500 text-white px-6 py-2 rounded text-center hover:bg-red-600 transition"
+                  >
+                    Register
+                  </Link>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
