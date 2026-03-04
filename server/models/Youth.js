@@ -86,9 +86,8 @@ const YouthSchema = new mongoose.Schema({
 });
 
 // Update lastUpdated on save
-YouthSchema.pre('save', function(next) {
+YouthSchema.pre('save', function() {
   this.lastUpdated = new Date();
-  next();
 });
 
 // Virtual for age group
