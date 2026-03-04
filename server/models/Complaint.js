@@ -59,11 +59,11 @@ const ComplaintSchema = new mongoose.Schema({
 });
 
 // Update resolvedAt when status changes to Resolved
-ComplaintSchema.pre('save', function(next) {
+ComplaintSchema.pre('save', function() {
   if (this.isModified('status') && this.status === 'Resolved') {
     this.resolvedAt = new Date();
   }
-  next();
+
 });
 
 const Complaint = mongoose.model('Complaint', ComplaintSchema);
