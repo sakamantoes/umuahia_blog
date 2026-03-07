@@ -29,7 +29,7 @@ import AdminDashboard from "./page/AdminDashboard";
 import Executives from "./page/Executives";
 
 // Set axios base URL
-axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.baseURL = "https://umuahia-blog-2.onrender.com";
 
 function App() {
   const [loading, setLoading] = useState(true);

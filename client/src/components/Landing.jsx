@@ -263,7 +263,7 @@ const Landing = () => {
                   className="relative rounded-2xl overflow-hidden shadow-2xl"
                 >
                   <img 
-                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=" 
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Abia_state_tower.jpg/1280px-Abia_state_tower.jpg" 
                     alt="Youth community gathering and collaboration" 
                     className="w-full h-[500px] object-cover"
                   />

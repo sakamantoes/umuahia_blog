@@ -134,7 +134,7 @@ function Executives() {
               {/* Image Container */}
               <div className="relative h-80 overflow-hidden">
                 <img
-                  src={`http://localhost:5000${exec.image}`}
+                  src={`https://umuahia-blog-2.onrender.com${exec.image}`}
                   alt={exec.name}
                   className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
                 />

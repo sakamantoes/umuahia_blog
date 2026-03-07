@@ -854,7 +854,7 @@ function AdminDashboard() {
             required
           ></textarea>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
             <input
               type="file"
               className="text-sm text-white/50 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"
@@ -939,7 +939,7 @@ function AdminDashboard() {
                   <td className="py-3 px-4">
                     {post.image && (
                       <img
-                        src={`http://localhost:5000${post.image}`}
+                        src={`https://umuahia-blog-2.onrender.com${post.image}`}
                         alt={post.title}
                         className="w-12 h-12 rounded-lg object-cover"
                       />
@@ -992,27 +992,31 @@ function AdminDashboard() {
   const renderYouths = () => (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
       {/* Header with Stats */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        {/* Title Section */}
         <div>
-          <h4 className="text-xl font-bold text-gray-800">
+          <h4 className="text-lg sm:text-xl font-bold text-gray-800">
             Registered Youth ({youths.length})
           </h4>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             Manage and view all youth registrations
           </p>
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+          {/* Search */}
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
               placeholder="Search youth..."
-              className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
-          <select className="px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white">
+
+          {/* Community Filter */}
+          <select className="w-full sm:w-auto px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white">
             <option>All Communities</option>
             {communities.map((c) => (
               <option key={c}>{c}</option>
@@ -1460,7 +1464,7 @@ function AdminDashboard() {
                   <td className="py-3 px-4">
                     {ann.image && (
                       <img
-                        src={`http://localhost:5000${ann.image}`}
+                        src={`https://umuahia-blog-2.onrender.com${ann.image}`}
                         alt={ann.title}
                         className="w-10 h-10 rounded-lg object-cover"
                       />
@@ -1568,7 +1572,7 @@ function AdminDashboard() {
                 <Pen size={16} /> Edit Executive
               </p>
             ) : (
-             <p className="flex items-center gap-2">
+              <p className="flex items-center gap-2">
                 <Plus size={16} /> Add New Executive
               </p>
             )}
@@ -1786,7 +1790,7 @@ function AdminDashboard() {
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
                           <img
-                            src={`http://localhost:5000${exec.image}`}
+                            src={`https://umuahia-blog-2.onrender.com${exec.image}`}
                             alt={exec.name}
                             className="h-12 w-12 rounded-full object-cover ring-2 ring-gray-200"
                             onError={(e) => {
@@ -1916,7 +1920,6 @@ function AdminDashboard() {
           </div>
 
           <div className="flex items-center gap-4">
-          
             <button
               className="px-4 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all flex items-center gap-2"
               onClick={handleLogout}

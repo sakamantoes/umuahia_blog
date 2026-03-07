@@ -30,7 +30,7 @@ function JoinForm() {
     }
   }, []);
 
-  const Api = 'http://localhost:5000/api/youth'; // Update with your actual API URL
+  const Api = 'https://umuahia-blog-2.onrender.com/api/youth'; // Update with your actual API URL
 
   const fetchCommunities = async () => {
     try {

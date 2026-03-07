@@ -80,7 +80,7 @@ function News() {
                 <div className="relative overflow-hidden h-48 bg-gray-100">
                   {post.image ? (
                     <img 
-                      src={`http://localhost:5000${post.image}`}
+                      src={`https://umuahia-blog-2.onrender.com${post.image}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       alt={post.title}
                     />

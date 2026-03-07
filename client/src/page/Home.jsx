@@ -12,6 +12,7 @@ import {
 import Loader from "../components/Loader";
 import Landing from "../components/Landing";
 import { motion } from "framer-motion";
+import ImageCarousel from "../components/ImageCarousel ";
 
 function Home() {
   const [featuredPosts, setFeaturedPosts] = useState([]);
@@ -27,7 +28,7 @@ function Home() {
     fetchData();
   }, []);
 
-  const Api = "http://localhost:5000"; // Update with your actual API URL
+  const Api = "https://umuahia-blog-2.onrender.com"; // Update with your actual API URL
 
   const fetchData = async () => {
     try {
@@ -138,7 +139,7 @@ function Home() {
                     <motion.img
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.4 }}
-                      src={`http://localhost:5000${post.image}`}
+                      src={`https://umuahia-blog-2.onrender.com${post.image}`}
                       alt={post.title}
                       className="h-48 w-full object-cover"
                     />
@@ -266,6 +267,8 @@ function Home() {
         </div>
       </section>
 
+      <ImageCarousel />
+
       {/* STATS */}
       <section className="mt-20 grid md:grid-cols-3 gap-6 mb-20">
         {/* Opportunities Card */}
@@ -364,7 +367,7 @@ function Home() {
               strokeWidth={1.5}
             />
           </motion.div>
-
+             
           {/* Counter with animation */}
           <motion.h3
             initial={{ scale: 0.5 }}

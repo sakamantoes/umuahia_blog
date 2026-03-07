@@ -168,7 +168,7 @@ function Lifestyle() {
               <div className="grid md:grid-cols-2 gap-0">
                 <div className="relative h-64 md:h-full overflow-hidden">
                   <img 
-                      src={`http://localhost:5000${posts[0].image}`}
+                      src={`https://umuahia-blog-2.onrender.com${posts[0].image}`}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     alt={posts[0]?.title}
                   />
@@ -253,7 +253,7 @@ function Lifestyle() {
                   <div className="relative h-48 overflow-hidden">
                     {post.image ? (
                       <img 
-                        src={`http://localhost:5000${post.image}`}
+                        src={`https://umuahia-blog-2.onrender.com${post.image}`}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         alt={post.title}
                       />
