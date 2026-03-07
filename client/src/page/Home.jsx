@@ -13,7 +13,7 @@ import Loader from "../components/Loader";
 import Landing from "../components/Landing";
 import { motion } from "framer-motion";
 import ImageCarousel from "../components/ImageCarousel ";
-
+// import AnnouncementMarquee from "../components/AnnouncementMarquee";
 function Home() {
   const [featuredPosts, setFeaturedPosts] = useState([]);
   const [stats, setStats] = useState({
@@ -93,7 +93,7 @@ function Home() {
     <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* HERO */}
       <Landing />
-
+ {/* <AnnouncementMarquee /> */}
       {/* FEATURED POSTS */}
       <section className="mt-16">
         <motion.div

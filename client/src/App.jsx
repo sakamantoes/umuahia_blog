@@ -12,7 +12,6 @@ import axios from "axios";
 import Navbar from "./components/Navbar";
 import JoinForm from "./components/JoinForm";
 import ComplaintForm from "./components/ComplaintForm";
-import AnnouncementMarquee from "./components/AnnouncementMarquee";
 import PostDetail from "./page/PostDetail";
 
 
@@ -84,7 +83,7 @@ function App() {
         />
 
         <Navbar />
-        <AnnouncementMarquee />
+       
        
 
         <main className="w-full m-auto">
