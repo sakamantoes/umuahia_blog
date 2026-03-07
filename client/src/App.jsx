@@ -14,7 +14,6 @@ import JoinForm from "./components/JoinForm";
 import ComplaintForm from "./components/ComplaintForm";
 import PostDetail from "./page/PostDetail";
 
-
 // Pages
 import Home from "./page/Home";
 import News from "./page/News";
@@ -26,6 +25,7 @@ import Resources from "./page/Resources";
 import AdminLogin from "./page/AdminLogin";
 import AdminDashboard from "./page/AdminDashboard";
 import Executives from "./page/Executives";
+import Loader from "./components/Loader";
 
 // Set axios base URL
 axios.defaults.baseURL = "https://umuahia-blog-2.onrender.com";
@@ -45,11 +45,10 @@ function App() {
         setLoading(false);
       });
   }, []);
-
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center vh-100">
-        <div className="spinner"></div>
+      <div className="flex justify-center items-center h-[50vh]">
+        <Loader />
       </div>
     );
   }
@@ -83,8 +82,6 @@ function App() {
         />
 
         <Navbar />
-       
-       
 
         <main className="w-full m-auto">
           <Routes>
@@ -109,7 +106,8 @@ function App() {
         <footer className="bg-gradient-to-r from-green-800 to-emerald-800 text-white text-center py-8 mt-5 shadow-inner">
           <div className="container mx-auto px-4">
             <p className="mb-2 text-lg font-light tracking-wide">
-              &copy; {new Date().getFullYear()} Umuahia South Youth Platform. All rights reserved.
+              &copy; {new Date().getFullYear()} Umuahia South Youth Platform.
+              All rights reserved.
             </p>
             <small className="text-green-200 text-sm opacity-90 italic">
               Empowering the youth of Umuahia South LGA
