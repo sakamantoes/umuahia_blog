@@ -1,186 +1,107 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
-const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userData = localStorage.getItem("user");
-    if (token && userData) {
-      setIsLoggedIn(true);
-      setUser(JSON.parse(userData));
-    }
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleToggle = () => {
-    setIsOpen(!isOpen);
-  };
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setIsLoggedIn(false);
-    setUser(null);
-    toast.success("Logged out successfully");
-    navigate("/");
-  };
-
-  const categories = [
-    { name: "News & Updates", path: "/posts/News & Updates" },
-    { name: "Opportunities", path: "/posts/Opportunities" },
-    { name: "Lifestyle", path: "/posts/Lifestyle" },
-    { name: "Culture", path: "/posts/Culture" },
-    { name: "Stories", path: "/posts/Stories" },
-    { name: "Resources", path: "/posts/Resources" },
+  const navLinks = [
+    { path: "/", label: "Home" },
+    { path: "/news", label: "News" },
+    { path: "/opportunities", label: "Opportunities" },
+    { path: "/lifestyle", label: "Lifestyle" },
+    { path: "/culture", label: "Culture" },
+    { path: "/stories", label: "Stories" },
+    { path: "/resources", label: "Resources" },
+    {path: "/executives", label: "Executives" },
   ];
 
   return (
-    <nav className="bg-white p-4 relative z-50 border-b border-red-100">
-      <div className="container mx-auto flex justify-between items-center">
-        
-        {/* Logo */}
-        <Link to="/" className="text-xl sm:text-3xl text-red-500 font-bold">
-          Umuahia Youth
-        </Link>
-
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center space-x-6">
-          {categories.map((cat) => (
-            <Link
-              key={cat.name}
-              to={cat.path}
-              className="text-gray-800 hover:text-red-500 transition font-semibold"
-            >
-              {cat.name}
-            </Link>
-          ))}
-
-          <Link
-            to="/youth-directory"
-            className="text-gray-800 hover:text-red-500 transition ml-5 font-semibold"
-          >
-            Youth Directory
+    <nav
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-gradient-to-r from-gray-900/40 to-gray-600/40 shadow-2xl backdrop-blur-sm"
+          : "bg-gradient-to-r from-white to-white"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="text-xl font-bold text-white transition-transform flex items-center gap-1.5 group-hover:scale-105">
+              <img src="/nycn.png" alt="logo for nycn" className="w-[58px]" />
+              <span className="text-yellow-400">Umuahia <span className="text-green-600">Youth</span></span>
+             
+            </div>
           </Link>
 
-          {isLoggedIn ? (
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-700 text-sm">
-                Hi, {user?.fullName?.split(" ")[0]}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <div className="flex space-x-3">
-              <Link
-                to="/login"
-                className="border border-red-500 text-red-500 px-4 py-2 rounded hover:bg-red-50 transition"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
-              >
-                Register
-              </Link>
-            </div>
-          )}
-        </div>
+          {/* Desktop Menu */}
+          <ul className="hidden md:flex space-x-8">
+            {navLinks.map((link) => (
+              <li key={link.path}>
+                <Link
+                  to={link.path}
+                  className={`relative text-sm font-medium transition-colors duration-200 ${
+                    location.pathname === link.path
+                      ? "text-yellow-400"
+                      : "text-green-600 hover:text-yellow-400"
+                  } after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-yellow-400 after:transition-all after:duration-300 hover:after:w-full`}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
 
-        {/* Mobile Toggle */}
-        <div className="md:hidden">
-          {isOpen ? (
-            <X size={28} onClick={handleToggle} className="text-red-500 cursor-pointer" />
-          ) : (
-            <Menu size={28} onClick={handleToggle} className="text-red-500 cursor-pointer" />
-          )}
+          {/* Mobile Toggle */}
+          <button
+            className="md:hidden p-2 rounded-lg hover:bg-green-600 transition-colors text-white"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X size={24} className="text-green-600 font-bold" /> : <Menu size={24} className="text-green-600 font-bold" />}
+          </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ duration: 0.4 }}
-            className="fixed top-0 right-0 w-full sm:w-1/2 h-screen bg-white text-gray-800 shadow-lg md:hidden"
-          >
-            <X
-              size={28}
-              onClick={handleToggle}
-              className="cursor-pointer absolute top-4 left-4 text-red-500"
-            />
-
-            <div className="flex flex-col items-center justify-center h-full gap-8 text-lg font-semibold">
-              {categories.map((cat) => (
-                <Link
-                  key={cat.name}
-                  to={cat.path}
-                  onClick={handleToggle}
-                  className="hover:text-red-500 transition"
-                >
-                  {cat.name}
-                </Link>
-              ))}
-
-              <Link
-                to="/youth"
-                onClick={handleToggle}
-                className="hover:text-red-500 transition"
-              >
-                Youth Directory
-              </Link>
-
-              {isLoggedIn ? (
-                <div className="flex flex-col items-center gap-4">
-                  <span>
-                    Hi, {user?.fullName?.split(" ")[0]}
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  <Link
-                    to="/login"
-                    onClick={handleToggle}
-                    className="border border-red-500 text-red-500 px-6 py-2 rounded text-center hover:bg-red-50 transition"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    onClick={handleToggle}
-                    className="bg-red-500 text-white px-6 py-2 rounded text-center hover:bg-red-600 transition"
-                  >
-                    Register
-                  </Link>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ${
+          isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="bg-gradient-to-b from-green-700 to-green-800 px-6 py-4 space-y-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`block px-4 py-2 rounded-lg transition-colors duration-200 ${
+                location.pathname === link.path
+                  ? "bg-green-600 text-yellow-400"
+                  : "text-white hover:bg-green-600"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      </div>
     </nav>
   );
-};
+}
 
 export default Navbar;

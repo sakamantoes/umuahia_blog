@@ -14,3 +14,17 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+
+strictly the frontend just regenerate the frontend with this dep  "@tailwindcss/vite": "^4.2.1",
+    "axios": "^1.13.6",
+    "chart.js": "^4.5.1",
+    "framer-motion": "^12.34.4",
+    "lucide-react": "^0.575.0",
+    "react": "^19.2.0",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "^19.2.0",
+    "react-hot-toast": "^2.6.0",
+    "react-multi-carousel": "^2.8.6",
+    "react-router-dom": "^7.13.1",
+    "tailwindcss": "^4.2.1"  i need a clean profession design 

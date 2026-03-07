@@ -1,129 +1,392 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import AnnouncementTicker from '../components/AnnouncementTicker';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import {
+  Users,
+  Newspaper,
+  Briefcase,
+  Heart,
+  Landmark,
+  BookOpen,
+} from "lucide-react";
+import Loader from "../components/Loader";
+import Landing from "../components/Landing";
+import { motion } from "framer-motion";
 
-const Home = () => {
-  const [stats, setStats] = useState({ total: 0, byCommunity: [] });
-  const [latestPosts, setLatestPosts] = useState([]);
+function Home() {
+  const [featuredPosts, setFeaturedPosts] = useState([]);
+  const [stats, setStats] = useState({
+    youthCount: 0,
+    opportunitiesCount: 0,
+    newsCount: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
-    fetchLatestPosts();
+    fetchData();
   }, []);
 
-  const fetchStats = async () => {
-    try {
-      const res = await axios.get('https://umuahia-blog.onrender.com/api/youth/stats');
-      setStats(res.data);
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    }
-  };
+  const Api = "http://localhost:5000"; // Update with your actual API URL
 
-  const fetchLatestPosts = async () => {
+  const fetchData = async () => {
     try {
-      const res = await axios.get('https://umuahia-blog.onrender.com/api/posts');
-      setLatestPosts(res.data.slice(0, 6));
+      const [postsRes, statsRes] = await Promise.all([
+        axios.get(`${Api}/api/posts?featured=true&limit=6`),
+        axios
+          .get(`${Api}/api/admin/stats`)
+          .catch(() => ({ data: { stats: {} } })),
+      ]);
+
+      setFeaturedPosts(postsRes.data.posts);
+
+      const opportunities = await axios.get(
+        `${Api}/api/posts/category/Opportunities?limit=1`,
+      );
+
+      const news = await axios.get(
+        `${Api}/api/posts/category/News%20&%20Updates?limit=1`,
+      );
+
+      setStats({
+        youthCount: statsRes.data.stats?.totalYouth || 0,
+        opportunitiesCount: opportunities.data.total || 0,
+        newsCount: news.data.total || 0,
+      });
+
+      setLoading(false);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      console.error("Error fetching data:", error);
+      setLoading(false);
     }
   };
 
   const categories = [
-    { name: 'News & Updates', icon: '📰', color: 'bg-blue-100' },
-    { name: 'Opportunities', icon: '💼', color: 'bg-green-100' },
-    { name: 'Lifestyle', icon: '🌟', color: 'bg-purple-100' },
-    { name: 'Culture', icon: '🎭', color: 'bg-red-100' },
-    { name: 'Stories', icon: '📖', color: 'bg-yellow-100' },
-    { name: 'Resources', icon: '📚', color: 'bg-indigo-100' }
+    {
+      name: "News & Updates",
+      icon: Newspaper,
+      path: "/news",
+      count: stats.newsCount,
+    },
+    {
+      name: "Opportunities",
+      icon: Briefcase,
+      path: "/opportunities",
+      count: stats.opportunitiesCount,
+    },
+    { name: "Lifestyle", icon: Heart, path: "/lifestyle" },
+    { name: "Culture", icon: Landmark, path: "/culture" },
+    { name: "Stories", icon: BookOpen, path: "/stories" },
+    { name: "Resources", icon: Users, path: "/resources" },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AnnouncementTicker />
-      
-      {/* Hero Section */}
-      <div className="bg-blue-600 text-white py-20">
-        <div className="container mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-4">Umuahia South Youth Platform</h1>
-          <p className="text-xl mb-8">Connect, Learn, and Grow with your community</p>
-          <Link 
-            to="/register" 
-            className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100"
-          >
-            Register Now
-          </Link>
-        </div>
-      </div>
+    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* HERO */}
+      <Landing />
 
-      {/* Stats Section */}
-      <div className="container mx-auto py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Our Community</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow text-center">
-            <div className="text-4xl font-bold text-blue-600">{stats.total}</div>
-            <div className="text-gray-600">Registered Youth</div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow text-center">
-            <div className="text-4xl font-bold text-green-600">{stats.byCommunity.length}</div>
-            <div className="text-gray-600">Communities</div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow text-center">
-            <div className="text-4xl font-bold text-purple-600">6</div>
-            <div className="text-gray-600">Categories</div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow text-center">
-            <div className="text-4xl font-bold text-orange-600">24/7</div>
-            <div className="text-gray-600">Active Platform</div>
-          </div>
-        </div>
-      </div>
+      {/* FEATURED POSTS */}
+      <section className="mt-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-10"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Featured{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">
+              Updates
+            </span>
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Latest news and opportunities from our community
+          </p>
+        </motion.div>
 
-      {/* Categories Grid */}
-      <div className="container mx-auto py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Explore Categories</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {categories.map((cat) => (
-            <Link 
-              key={cat.name} 
-              to={`/posts/${cat.name}`}
-              className={`${cat.color} p-8 rounded-lg shadow hover:shadow-lg transition-shadow`}
-            >
-              <div className="text-4xl mb-4">{cat.icon}</div>
-              <h3 className="text-xl font-semibold">{cat.name}</h3>
-            </Link>
-          ))}
-        </div>
-      </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {featuredPosts.length > 0 ? (
+            featuredPosts.map((post, index) => (
+              <motion.div
+                key={post._id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                  type: "spring",
+                  stiffness: 100,
+                }}
+                viewport={{ once: true, margin: "-50px" }}
+                whileHover={{
+                  y: -8,
+                  transition: { type: "spring", stiffness: 400, damping: 10 },
+                }}
+                className="bg-white rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 group"
+              >
+                {post.image && (
+                  <div className="relative overflow-hidden h-48">
+                    <motion.img
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.4 }}
+                      src={`http://localhost:5000${post.image}`}
+                      alt={post.title}
+                      className="h-48 w-full object-cover"
+                    />
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      whileHover={{ opacity: 1 }}
+                      className="absolute inset-0 bg-gradient-to-t from-green-600/20 to-transparent"
+                    />
+                  </div>
+                )}
 
-      {/* Latest Posts */}
-      <div className="container mx-auto py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Latest Updates</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {latestPosts.map((post) => (
-            <div key={post._id} className="bg-white rounded-lg shadow overflow-hidden">
-              {post.image && (
-                <img 
-                  src={`https://umuahia-api.onrender.com${post.image}`} 
-                  alt={post.title}
-                  className="w-full h-48 object-cover"
-                />
-              )}
-              <div className="p-6">
-                <span className="text-sm text-blue-600 font-semibold">{post.category}</span>
-                <h3 className="text-xl font-semibold mt-2">{post.title}</h3>
-                <p className="text-gray-600 mt-2">{post.content.substring(0, 100)}...</p>
-                <div className="mt-4 text-sm text-gray-500">
-                  By {post.author?.fullName || 'Unknown'} | {new Date(post.createdAt).toLocaleDateString()}
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <motion.span
+                      whileHover={{ scale: 1.05 }}
+                      className="text-xs bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 px-3 py-1.5 rounded-full font-medium border border-green-100"
+                    >
+                      {post.category}
+                    </motion.span>
+
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                      <motion.svg
+                        initial={{ rotate: 0 }}
+                        whileHover={{ rotate: 360 }}
+                        transition={{ duration: 0.6 }}
+                        className="w-3 h-3 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        ></path>
+                      </motion.svg>
+                      {new Date(post.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  <motion.h3
+                    initial={{ opacity: 0.9 }}
+                    whileHover={{ opacity: 1 }}
+                    className="font-bold text-lg mb-2 text-gray-800 group-hover:text-green-700 transition-colors line-clamp-2"
+                  >
+                    {post.title}
+                  </motion.h3>
+
+                  <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3">
+                    {post.content.substring(0, 120)}...
+                  </p>
+
+                  <motion.div
+                    whileHover={{ x: 5 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                  >
+                    <Link
+                      to={`/${post.category.toLowerCase().replace(/ & /g, "-")}`}
+                      className="inline-flex items-center gap-2 text-green-600 font-semibold hover:text-green-700 transition-colors group/link"
+                    >
+                      Read More
+                      <motion.span
+                        animate={{ x: [0, 3, 0] }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          repeatType: "loop",
+                        }}
+                        className="inline-block"
+                      >
+                        →
+                      </motion.span>
+                    </Link>
+                  </motion.div>
                 </div>
-              </div>
-            </div>
-          ))}
+
+                {/* Decorative corner accent */}
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileHover={{ width: "100%" }}
+                  transition={{ duration: 0.3 }}
+                  className="h-1 bg-gradient-to-r from-green-500 to-emerald-500"
+                />
+              </motion.div>
+            ))
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              className="col-span-full text-center py-12"
+            >
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 5, -5, 0],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                }}
+                className="inline-block mb-4"
+              >
+                <svg
+                  className="w-16 h-16 text-gray-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                  ></path>
+                </svg>
+              </motion.div>
+              <p className="text-gray-500 text-lg">No featured posts yet.</p>
+              <p className="text-gray-400 text-sm mt-2">
+                Check back soon for updates!
+              </p>
+            </motion.div>
+          )}
         </div>
-      </div>
+      </section>
+
+      {/* STATS */}
+      <section className="mt-20 grid md:grid-cols-3 gap-6 mb-20">
+        {/* Opportunities Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          viewport={{ once: true }}
+          whileHover={{
+            y: -8,
+            boxShadow: "0 25px 30px -12px rgba(22, 163, 74, 0.35)",
+            transition: { type: "spring", stiffness: 400, damping: 17 },
+          }}
+          className="bg-gradient-to-br from-green-600 to-green-500 text-white rounded-xl p-8 text-center shadow-lg hover:shadow-2xl relative overflow-hidden group"
+        >
+          {/* Animated background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,white,transparent_50%)]"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,white,transparent_50%)]"></div>
+          </div>
+
+          {/* Icon with animation */}
+          <motion.div
+            animate={{
+              rotate: [0, 5, -5, 0],
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="relative"
+          >
+            <Briefcase
+              className="mx-auto mb-3 relative z-10"
+              size={40}
+              strokeWidth={1.5}
+            />
+          </motion.div>
+
+          {/* Counter with animation */}
+          <motion.h3
+            initial={{ scale: 0.5 }}
+            whileInView={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+            className="text-3xl font-bold relative z-10"
+          >
+            {stats.opportunitiesCount}+
+          </motion.h3>
+
+          <p className="relative z-10 text-green-100 font-medium">
+            Opportunities
+          </p>
+
+          {/* Decorative corner accent */}
+          <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-bl-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-tr-3xl"></div>
+        </motion.div>
+
+        {/* News Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          viewport={{ once: true }}
+          whileHover={{
+            y: -8,
+            boxShadow: "0 25px 30px -12px rgba(79, 70, 229, 0.35)",
+            transition: { type: "spring", stiffness: 400, damping: 17 },
+          }}
+          className="bg-gradient-to-br from-indigo-600 to-indigo-500 text-white rounded-xl p-8 text-center shadow-lg hover:shadow-2xl relative overflow-hidden group"
+        >
+          {/* Animated background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,white,transparent_50%)]"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,white,transparent_50%)]"></div>
+          </div>
+
+          {/* Icon with animation */}
+          <motion.div
+            animate={{
+              rotateY: [0, 180, 360],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            style={{ transformStyle: "preserve-3d" }}
+            className="relative"
+          >
+            <Newspaper
+              className="mx-auto mb-3 relative z-10"
+              size={40}
+              strokeWidth={1.5}
+            />
+          </motion.div>
+
+          {/* Counter with animation */}
+          <motion.h3
+            initial={{ scale: 0.5 }}
+            whileInView={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
+            className="text-3xl font-bold relative z-10"
+          >
+            {stats.newsCount}+
+          </motion.h3>
+
+          <p className="relative z-10 text-indigo-100 font-medium">
+            News Updates
+          </p>
+
+          {/* Decorative corner accent */}
+          <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-bl-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-tr-3xl"></div>
+        </motion.div>
+
+      </section>
     </div>
   );
-};
+}
 
 export default Home;

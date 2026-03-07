@@ -10,6 +10,7 @@ import YouthRoutes from './routes/youth.js';
 import PostRoutes from './routes/posts.js';
 import AnnouncementRoutes from './routes/announcement.js';
 import ComplaintRoutes from './routes/complaint.js';
+import ExecutiveRoutes from './routes/executiveRoutes.js';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use('/api/admin', AdminRoutes);
 app.use('/api/youth', YouthRoutes);
 app.use('/api/posts', PostRoutes);
 app.use('/api/complaints', ComplaintRoutes);
+app.use('/api/executives', ExecutiveRoutes);
 app.use('/api/announcements', AnnouncementRoutes);
 
 
