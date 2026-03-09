@@ -28,7 +28,11 @@ function Navbar() {
     { path: "/culture", label: "Culture" },
     { path: "/stories", label: "Stories" },
     { path: "/resources", label: "Resources" },
-    {path: "/executives", label: "Executives" },
+    { path: "/executives", label: "Executives" },
+    {
+      path: "/aboutus",
+      label: "About Us",
+    },
   ];
 
   return (
@@ -45,8 +49,9 @@ function Navbar() {
           <Link to="/" className="flex items-center gap-2 group">
             <div className="text-xl font-bold text-white transition-transform flex items-center gap-1.5 group-hover:scale-105">
               <img src="/nycn.png" alt="logo for nycn" className="w-[58px]" />
-              <span className="text-yellow-400">Umuahia <span className="text-green-600">Youth</span></span>
-             
+              <span className="text-yellow-400">
+                Umuahia <span className="text-green-600">Youth</span>
+              </span>
             </div>
           </Link>
 
@@ -73,7 +78,11 @@ function Navbar() {
             className="md:hidden p-2 rounded-lg hover:bg-green-600 transition-colors text-white"
             onClick={() => setIsOpen(!isOpen)}
           >
-            {isOpen ? <X size={24} className="text-green-600 font-bold" /> : <Menu size={24} className="text-green-600 font-bold" />}
+            {isOpen ? (
+              <X size={24} className="text-green-600 font-bold" />
+            ) : (
+              <Menu size={24} className="text-green-600 font-bold" />
+            )}
           </button>
         </div>
       </div>
@@ -81,7 +90,7 @@ function Navbar() {
       {/* Mobile Menu */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-300 ${
-          isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          isOpen ? "h-screen opacity-100" : "h-0 opacity-0 overflow-hidden"
         }`}
       >
         <div className="bg-gradient-to-b from-green-700 to-green-800 px-6 py-4 space-y-1">

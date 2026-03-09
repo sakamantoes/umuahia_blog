@@ -61,7 +61,7 @@ const Api = 'https://umuahia-blog-2.onrender.com/api/complaints'; // Update with
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
           </div>
-          <span className="text-[12px] font-semibold">Submit Complaint</span>
+          <span className="text-[12px] font-semibold">Contact Us</span>
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 blur-xl opacity-50 group-hover:opacity-75 transition-opacity -z-10"></div>
         </button>
       ) : (
@@ -90,7 +90,7 @@ const Api = 'https://umuahia-blog-2.onrender.com/api/complaints'; // Update with
                 </div>
                 <div>
                   <h2 className="font-bold text-xl text-white tracking-tight">
-                    Submit Complaint
+                    Contact Us
                   </h2>
                   <p className="text-xs text-white/80 mt-0.5">We value your feedback</p>
                 </div>

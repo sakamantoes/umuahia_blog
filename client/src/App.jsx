@@ -26,6 +26,7 @@ import AdminLogin from "./page/AdminLogin";
 import AdminDashboard from "./page/AdminDashboard";
 import Executives from "./page/Executives";
 import Loader from "./components/Loader";
+import AboutUs from "./page/AboutUs";
 
 // Set axios base URL
 axios.defaults.baseURL = "https://umuahia-blog-2.onrender.com";
@@ -90,6 +91,7 @@ function App() {
             <Route path="/opportunities" element={<Opportunities />} />
             <Route path="/lifestyle" element={<Lifestyle />} />
             <Route path="/culture" element={<Culture />} />
+            <Route path="/aboutus" element={<AboutUs />} />
             <Route path="/:category/:id" element={<PostDetail />} />
             <Route path="/stories" element={<Stories />} />
             <Route path="/resources" element={<Resources />} />
