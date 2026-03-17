@@ -49,8 +49,8 @@ function Navbar() {
           <Link to="/" className="flex items-center gap-2 group">
             <div className="text-xl font-bold text-white transition-transform flex items-center gap-1.5 group-hover:scale-105">
               <img src="/nycn.png" alt="logo for nycn" className="w-[58px]" />
-              <span className="text-yellow-400">
-                Umuahia <span className="text-green-600">Youth</span>
+              <span className="text-yellow-400"> NYCN
+                Umuahia <span className="text-green-600">Chapter</span>
               </span>
             </div>
           </Link>
