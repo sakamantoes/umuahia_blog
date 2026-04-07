@@ -28,7 +28,7 @@ function Home() {
     fetchData();
   }, []);
 
-  const Api = "http://localhost:5000"; // Update with your actual API URL
+  const Api = "https://umuahia-blog-3.onrender.com/"; // Update with your actual API URL
 
   const fetchData = async () => {
     try {
@@ -139,7 +139,7 @@ function Home() {
                     <motion.img
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.4 }}
-                      src={`http://localhost:5000${post.image}`}
+                      src={`https://umuahia-blog-3.onrender.com/${post.image}`}
                       alt={post.title}
                       className="h-48 w-full object-cover"
                     />

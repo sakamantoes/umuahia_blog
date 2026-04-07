@@ -316,7 +316,7 @@ function Resources() {
                     
                     {post.image?.includes('.pdf') && (
                       <a 
-                        href={`http://localhost:5000${post.image}`}
+                        href={`https://umuahia-blog-3.onrender.com/${post.image}`}
                         download
                         className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 text-sm font-medium rounded-lg hover:bg-red-100 transition border border-red-200"
                       >

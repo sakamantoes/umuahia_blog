@@ -29,7 +29,7 @@ import Loader from "./components/Loader";
 import AboutUs from "./page/AboutUs";
 
 // Set axios base URL
-axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.baseURL = "https://umuahia-blog-3.onrender.com/";
 
 function App() {
   const [loading, setLoading] = useState(true);

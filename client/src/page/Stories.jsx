@@ -123,7 +123,7 @@ function Stories() {
                     {selectedStory.image ? (
                       <>
                         <img 
-                          src={`http://localhost:5000${selectedStory.image}`}
+                          src={`https://umuahia-blog-3.onrender.com/${selectedStory.image}`}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                           alt={selectedStory.title}
                         />
@@ -265,7 +265,7 @@ function Stories() {
                   <div className="relative h-56 overflow-hidden">
                     {post.image ? (
                       <img 
-                        src={`http://localhost:5000${post.image}`}
+                        src={`https://umuahia-blog-3.onrender.com/${post.image}`}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         alt={post.title}
                       />
