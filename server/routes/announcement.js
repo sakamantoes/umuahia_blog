@@ -2,7 +2,7 @@ import express from "express";
 import { body, validationResult } from "express-validator";
 import Announcement from "../models/Announcement.js";
 import auth from "../middleware/auth.js";
-import upload from "../middleware/upload.js";
+
 
 const router = express.Router();
 
@@ -112,7 +112,6 @@ router.get("/urgent", async (req, res) => {
 router.post(
   "/",
   auth,
-  upload.single("image"),
   [
     body("title").not().isEmpty().withMessage("Title is required"),
     body("content").not().isEmpty().withMessage("Content is required"),
@@ -200,7 +199,7 @@ router.get("/admin/all", auth, async (req, res) => {
 // @route   PUT api/announcements/:id
 // @desc    Update announcement
 // @access  Private
-router.put("/:id", auth, upload.single("image"), async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   try {
     const updateData = { ...req.body };
 

@@ -2,8 +2,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 import AdminRoutes from './routes/admin.js';
 import YouthRoutes from './routes/youth.js';
@@ -14,8 +12,6 @@ import ExecutiveRoutes from './routes/executiveRoutes.js';
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,7 +19,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
   mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://godswilltrade2004_db_user:q3WG7VecnYGwE335@cluster0.jcc8ghr.mongodb.net/?appName=Cluster0')
   .then(async () => {

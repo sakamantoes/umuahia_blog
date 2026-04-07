@@ -136,13 +136,13 @@ router.post(
 // @desc    Verify admin token
 // @access  Private
 
-
 router.get("/verify", authenticate, async (req, res, next) => {
   try {
-    const admin = await Admin.findById(req.admin.id);
+    const admin = await Admin.findById(req.user.id); // ✅ FIX
+
     res.json(admin);
   } catch (err) {
-    next(err); // sends error to global handler
+    next(err);
   }
 });
 

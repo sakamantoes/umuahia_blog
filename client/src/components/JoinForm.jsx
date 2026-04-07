@@ -30,7 +30,7 @@ function JoinForm() {
     }
   }, []);
 
-  const Api = 'https://umuahia-blog-2.onrender.com/api/youth'; // Update with your actual API URL
+  const Api = 'http://localhost:5000/api/youth'; // Update with your actual API URL
 
   const fetchCommunities = async () => {
     try {
@@ -294,36 +294,6 @@ function JoinForm() {
         </div>
       )}
 
-      {/* Add animation styles */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-        
-        .animate-slideUp {
-          animation: slideUp 0.4s ease-out;
-        }
-      `}</style>
     </>
   );
 }

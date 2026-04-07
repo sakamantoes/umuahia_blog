@@ -22,7 +22,6 @@ import {
   Download,
   Search,
   Home,
-  Settings,
   Activity,
   BarChart2,
   PieChart,
@@ -34,10 +33,6 @@ import {
   Star,
   Crown,
   Check,
-  ChevronDown,
-  MoreVertical,
-  Pen,
-  User2,
 } from "lucide-react";
 import {
   Chart as ChartJS,
@@ -77,7 +72,6 @@ function AdminDashboard() {
   const [complaints, setComplaints] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("all");
   const [formData, setFormData] = useState({
     title: "",
     category: "News & Updates",
@@ -95,8 +89,10 @@ function AdminDashboard() {
     link: "",
     expiresAt: "",
   });
-  const [image, setImage] = useState(null);
-  const [announcementImage, setAnnouncementImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null); // Changed to store File object
+  const [imagePreview, setImagePreview] = useState(""); // For preview only
+  const [announcementImageFile, setAnnouncementImageFile] = useState(null);
+  const [announcementImagePreview, setAnnouncementImagePreview] = useState("");
   const [executiveForm, setExecutiveForm] = useState({
     name: "",
     title: "",
@@ -104,8 +100,11 @@ function AdminDashboard() {
     order: 0,
     isActive: true,
   });
-  const [executiveImage, setExecutiveImage] = useState(null);
+  const [executiveImageFile, setExecutiveImageFile] = useState(null);
+  const [executiveImagePreview, setExecutiveImagePreview] = useState("");
   const [editingExecutive, setEditingExecutive] = useState(null);
+  const [editingPost, setEditingPost] = useState(null);
+  const [editingAnnouncement, setEditingAnnouncement] = useState(null);
 
   const [communities] = useState([
     "Umuahia Urban",
@@ -193,6 +192,37 @@ function AdminDashboard() {
     toast.success("Logged out successfully");
   };
 
+  // Handle image for posts - store File object for upload
+  const handlePostImage = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  // Handle image for executives
+  const handleExecutiveImage = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setExecutiveImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setExecutiveImagePreview(previewUrl);
+    }
+  };
+
+  // Handle image for announcements
+  const handleAnnouncementImage = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAnnouncementImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setAnnouncementImagePreview(previewUrl);
+    }
+  };
+
   // Executive Handlers
   const handleExecutiveChange = (e) => {
     setExecutiveForm({
@@ -205,30 +235,32 @@ function AdminDashboard() {
     e.preventDefault();
     const token = localStorage.getItem("adminToken");
 
-    const formData = new FormData();
-    formData.append("name", executiveForm.name);
-    formData.append("title", executiveForm.title);
-    formData.append("description", executiveForm.description || "");
-    formData.append("order", executiveForm.order);
-    formData.append("isActive", executiveForm.isActive);
-    if (executiveImage) {
-      formData.append("image", executiveImage);
+    // Create FormData for file upload
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", executiveForm.name);
+    formDataToSend.append("title", executiveForm.title);
+    formDataToSend.append("description", executiveForm.description || "");
+    formDataToSend.append("order", executiveForm.order.toString());
+    formDataToSend.append("isActive", executiveForm.isActive.toString());
+    
+    if (executiveImageFile) {
+      formDataToSend.append("image", executiveImageFile);
     }
 
     try {
       if (editingExecutive) {
-        await axios.put(`/api/executives/${editingExecutive._id}`, formData, {
-          headers: {
+        await axios.put(`/api/executives/${editingExecutive._id}`, formDataToSend, {
+          headers: { 
             "x-auth-token": token,
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "multipart/form-data"
           },
         });
         toast.success("Executive updated successfully");
       } else {
-        await axios.post("/api/executives", formData, {
-          headers: {
+        await axios.post("/api/executives", formDataToSend, {
+          headers: { 
             "x-auth-token": token,
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "multipart/form-data"
           },
         });
         toast.success("Executive added successfully");
@@ -241,11 +273,13 @@ function AdminDashboard() {
         order: 0,
         isActive: true,
       });
-      setExecutiveImage(null);
+      setExecutiveImageFile(null);
+      setExecutiveImagePreview("");
       setEditingExecutive(null);
       fetchAllData();
     } catch (error) {
-      toast.error(error.response?.data?.msg || "Error saving executive");
+      console.error("Executive save error:", error);
+      toast.error(error.response?.data?.error || error.response?.data?.msg || "Error saving executive");
     }
   };
 
@@ -258,6 +292,8 @@ function AdminDashboard() {
       order: exec.order,
       isActive: exec.isActive,
     });
+    setExecutiveImagePreview(exec.image || "");
+    setExecutiveImageFile(null); // Clear file input
   };
 
   const handleDeleteExecutive = async (id) => {
@@ -282,11 +318,9 @@ function AdminDashboard() {
       await axios.put(
         `/api/executives/${id}`,
         { isActive: !currentStatus },
-        { headers: { "x-auth-token": token } },
+        { headers: { "x-auth-token": token } }
       );
-      toast.success(
-        `Executive ${!currentStatus ? "activated" : "deactivated"}`,
-      );
+      toast.success(`Executive ${!currentStatus ? "activated" : "deactivated"}`);
       fetchAllData();
     } catch (error) {
       toast.error("Error updating status");
@@ -305,26 +339,38 @@ function AdminDashboard() {
     e.preventDefault();
     const token = localStorage.getItem("adminToken");
 
+    // Create FormData for file upload
     const formDataToSend = new FormData();
     formDataToSend.append("title", formData.title);
     formDataToSend.append("category", formData.category);
     formDataToSend.append("content", formData.content);
-    formDataToSend.append("summary", formData.summary);
-    formDataToSend.append("tags", formData.tags);
-    formDataToSend.append("isFeatured", formData.isFeatured);
-
-    if (image) {
-      formDataToSend.append("image", image);
+    formDataToSend.append("summary", formData.summary || "");
+    formDataToSend.append("tags", formData.tags || "");
+    formDataToSend.append("isFeatured", formData.isFeatured.toString());
+    
+    if (imageFile) {
+      formDataToSend.append("image", imageFile);
     }
 
     try {
-      await axios.post("/api/posts", formDataToSend, {
-        headers: {
-          "x-auth-token": token,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      toast.success("Post created successfully");
+      if (editingPost) {
+        await axios.put(`/api/posts/${editingPost._id}`, formDataToSend, {
+          headers: { 
+            "x-auth-token": token,
+            "Content-Type": "multipart/form-data"
+          },
+        });
+        toast.success("Post updated successfully");
+      } else {
+        await axios.post("/api/posts", formDataToSend, {
+          headers: { 
+            "x-auth-token": token,
+            "Content-Type": "multipart/form-data"
+          },
+        });
+        toast.success("Post created successfully");
+      }
+
       setFormData({
         title: "",
         category: "News & Updates",
@@ -333,11 +379,28 @@ function AdminDashboard() {
         tags: "",
         isFeatured: false,
       });
-      setImage(null);
+      setImageFile(null);
+      setImagePreview("");
+      setEditingPost(null);
       fetchAllData();
     } catch (error) {
-      toast.error(error.response?.data?.msg || "Error creating post");
+      console.error("Post save error:", error);
+      toast.error(error.response?.data?.error || error.response?.data?.msg || "Error saving post");
     }
+  };
+
+  const handleEditPost = (post) => {
+    setEditingPost(post);
+    setFormData({
+      title: post.title,
+      category: post.category,
+      content: post.content,
+      summary: post.summary || "",
+      tags: post.tags ? (Array.isArray(post.tags) ? post.tags.join(", ") : post.tags) : "",
+      isFeatured: post.isFeatured || false,
+    });
+    setImagePreview(post.image || "");
+    setImageFile(null);
   };
 
   const handleDeletePost = async (id) => {
@@ -395,30 +458,49 @@ function AdminDashboard() {
     e.preventDefault();
     const token = localStorage.getItem("adminToken");
 
+    const announcementData = {
+      title: announcementForm.title,
+      content: announcementForm.content,
+      type: announcementForm.type,
+      priority: announcementForm.priority,
+      targetCommunities: announcementForm.targetCommunities,
+      link: announcementForm.link || "",
+      expiresAt: announcementForm.expiresAt || "",
+    };
+
+    // For announcements, if you want to support image upload similarly:
     const formDataToSend = new FormData();
     formDataToSend.append("title", announcementForm.title);
     formDataToSend.append("content", announcementForm.content);
     formDataToSend.append("type", announcementForm.type);
     formDataToSend.append("priority", announcementForm.priority);
-    formDataToSend.append(
-      "targetCommunities",
-      announcementForm.targetCommunities.join(","),
-    );
+    formDataToSend.append("targetCommunities", JSON.stringify(announcementForm.targetCommunities));
     formDataToSend.append("link", announcementForm.link || "");
     formDataToSend.append("expiresAt", announcementForm.expiresAt || "");
-
-    if (announcementImage) {
-      formDataToSend.append("image", announcementImage);
+    
+    if (announcementImageFile) {
+      formDataToSend.append("image", announcementImageFile);
     }
 
     try {
-      await axios.post("/api/announcements", formDataToSend, {
-        headers: {
-          "x-auth-token": token,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      toast.success("Announcement created successfully");
+      if (editingAnnouncement) {
+        await axios.put(`/api/announcements/${editingAnnouncement._id}`, formDataToSend, {
+          headers: { 
+            "x-auth-token": token,
+            "Content-Type": "multipart/form-data"
+          },
+        });
+        toast.success("Announcement updated successfully");
+      } else {
+        await axios.post("/api/announcements", formDataToSend, {
+          headers: { 
+            "x-auth-token": token,
+            "Content-Type": "multipart/form-data"
+          },
+        });
+        toast.success("Announcement created successfully");
+      }
+
       setAnnouncementForm({
         title: "",
         content: "",
@@ -428,10 +510,13 @@ function AdminDashboard() {
         link: "",
         expiresAt: "",
       });
-      setAnnouncementImage(null);
+      setAnnouncementImageFile(null);
+      setAnnouncementImagePreview("");
+      setEditingAnnouncement(null);
       fetchAllData();
     } catch (error) {
-      toast.error(error.response?.data?.msg || "Error creating announcement");
+      console.error("Announcement save error:", error);
+      toast.error(error.response?.data?.msg || "Error saving announcement");
     }
   };
 
@@ -441,9 +526,7 @@ function AdminDashboard() {
       await axios.patch(
         `/api/announcements/${id}/toggle`,
         {},
-        {
-          headers: { "x-auth-token": token },
-        },
+        { headers: { "x-auth-token": token } }
       );
       toast.success("Announcement status toggled");
       fetchAllData();
@@ -510,8 +593,24 @@ function AdminDashboard() {
     ],
   };
 
-  // Render functions
+  // Cleanup object URLs on component unmount
+  useEffect(() => {
+    return () => {
+      if (imagePreview && imagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview);
+      }
+      if (executiveImagePreview && executiveImagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(executiveImagePreview);
+      }
+      if (announcementImagePreview && announcementImagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(announcementImagePreview);
+      }
+    };
+  }, [imagePreview, executiveImagePreview, announcementImagePreview]);
+
+  // Render functions (keep your existing render functions - just update image preview sources)
   const renderDashboard = () => (
+    // ... keep your existing dashboard render code
     <div className="space-y-6">
       {/* Welcome Header */}
       <div className="flex items-center justify-between">
@@ -792,11 +891,11 @@ function AdminDashboard() {
 
   const renderPosts = () => (
     <div className="space-y-6">
-      {/* Create Post Card */}
+      {/* Create/Edit Post Card */}
       <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-white shadow-xl">
         <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <Plus className="w-5 h-5" />
-          Create New Post
+          {editingPost ? <Edit className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+          {editingPost ? "Edit Post" : "Create New Post"}
         </h4>
         <form onSubmit={handleSubmitPost} className="space-y-4">
           <input
@@ -855,12 +954,23 @@ function AdminDashboard() {
           ></textarea>
 
           <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <input
-              type="file"
-              className="text-sm text-white/50 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"
-              accept="image/*"
-              onChange={(e) => setImage(e.target.files[0])}
-            />
+            <div className="flex-1">
+              <input
+                type="file"
+                className="text-sm text-white/50 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"
+                accept="image/*"
+                onChange={handlePostImage}
+              />
+              {imagePreview && (
+                <div className="mt-2">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="h-20 w-20 object-cover rounded-lg"
+                  />
+                </div>
+              )}
+            </div>
 
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -876,13 +986,37 @@ function AdminDashboard() {
             </label>
           </div>
 
-          <button
-            type="submit"
-            className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-xl font-semibold transition-all flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Create Post
-          </button>
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-xl font-semibold transition-all flex items-center gap-2"
+            >
+              {editingPost ? <Edit className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              {editingPost ? "Update Post" : "Create Post"}
+            </button>
+            
+            {editingPost && (
+              <button
+                type="button"
+                className="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-xl font-semibold transition-all"
+                onClick={() => {
+                  setEditingPost(null);
+                  setFormData({
+                    title: "",
+                    category: "News & Updates",
+                    content: "",
+                    summary: "",
+                    tags: "",
+                    isFeatured: false,
+                  });
+                  setImageFile(null);
+                  setImagePreview("");
+                }}
+              >
+                Cancel Edit
+              </button>
+            )}
+          </div>
         </form>
       </div>
 
@@ -939,7 +1073,7 @@ function AdminDashboard() {
                   <td className="py-3 px-4">
                     {post.image && (
                       <img
-                        src={`https://umuahia-blog-2.onrender.com${post.image}`}
+                        src={post.image}
                         alt={post.title}
                         className="w-12 h-12 rounded-lg object-cover"
                       />
@@ -967,6 +1101,7 @@ function AdminDashboard() {
                       </button>
                       <button
                         className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-all"
+                        onClick={() => handleEditPost(post)}
                         title="Edit"
                       >
                         <Edit className="w-4 h-4" />
@@ -1291,8 +1426,8 @@ function AdminDashboard() {
       {/* Create Announcement Card */}
       <div className="bg-gradient-to-br from-purple-600 to-green-600 rounded-2xl p-6 text-white shadow-xl">
         <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <Bell className="w-5 h-5" />
-          Create New Announcement
+          {editingAnnouncement ? <Edit className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
+          {editingAnnouncement ? "Edit Announcement" : "Create New Announcement"}
         </h4>
         <form onSubmit={handleSubmitAnnouncement} className="space-y-4">
           <input
@@ -1392,18 +1527,52 @@ function AdminDashboard() {
                 type="file"
                 className="text-sm text-white/50 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"
                 accept="image/*"
-                onChange={(e) => setAnnouncementImage(e.target.files[0])}
+                onChange={handleAnnouncementImage}
               />
+              {announcementImagePreview && (
+                <div className="mt-2">
+                  <img
+                    src={announcementImagePreview}
+                    alt="Preview"
+                    className="h-20 w-20 object-cover rounded-lg"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="px-6 py-3 bg-white text-purple-600 hover:bg-gray-100 rounded-xl font-semibold transition-all flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Create Announcement
-          </button>
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              className="px-6 py-3 bg-white text-purple-600 hover:bg-gray-100 rounded-xl font-semibold transition-all flex items-center gap-2"
+            >
+              {editingAnnouncement ? <Edit className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              {editingAnnouncement ? "Update Announcement" : "Create Announcement"}
+            </button>
+            
+            {editingAnnouncement && (
+              <button
+                type="button"
+                className="px-6 py-3 bg-gray-600 text-white hover:bg-gray-700 rounded-xl font-semibold transition-all"
+                onClick={() => {
+                  setEditingAnnouncement(null);
+                  setAnnouncementForm({
+                    title: "",
+                    content: "",
+                    type: "General",
+                    priority: "Medium",
+                    targetCommunities: ["All Communities"],
+                    link: "",
+                    expiresAt: "",
+                  });
+                  setAnnouncementImageFile(null);
+                  setAnnouncementImagePreview("");
+                }}
+              >
+                Cancel Edit
+              </button>
+            )}
+          </div>
         </form>
       </div>
 
@@ -1464,7 +1633,7 @@ function AdminDashboard() {
                   <td className="py-3 px-4">
                     {ann.image && (
                       <img
-                        src={`https://umuahia-blog-2.onrender.com${ann.image}`}
+                        src={ann.image}
                         alt={ann.title}
                         className="w-10 h-10 rounded-lg object-cover"
                       />
@@ -1566,16 +1735,9 @@ function AdminDashboard() {
       {/* Add/Edit Executive Card */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
         <div className="px-6 py-5 bg-gradient-to-r from-green-600 to-indigo-700">
-          <h4 className="text-lg font-semibold text-white">
-            {editingExecutive ? (
-              <p className="flex items-center gap-2">
-                <Pen size={16} /> Edit Executive
-              </p>
-            ) : (
-              <p className="flex items-center gap-2">
-                <Plus size={16} /> Add New Executive
-              </p>
-            )}
+          <h4 className="text-lg font-semibold text-white flex items-center gap-2">
+            {editingExecutive ? <Edit size={16} /> : <Plus size={16} />}
+            {editingExecutive ? "Edit Executive" : "Add New Executive"}
           </h4>
         </div>
 
@@ -1649,15 +1811,21 @@ function AdminDashboard() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Profile Image
                 </label>
-                <div className="relative">
-                  <input
-                    type="file"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    accept="image/*"
-                    onChange={(e) => setExecutiveImage(e.target.files[0])}
-                    required={!editingExecutive}
-                  />
-                </div>
+                <input
+                  type="file"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  accept="image/*"
+                  onChange={handleExecutiveImage}
+                />
+                {executiveImagePreview && (
+                  <div className="mt-2">
+                    <img
+                      src={executiveImagePreview}
+                      alt="Preview"
+                      className="h-20 w-20 rounded-full object-cover"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1703,7 +1871,8 @@ function AdminDashboard() {
                       order: 0,
                       isActive: true,
                     });
-                    setExecutiveImage(null);
+                    setExecutiveImageFile(null);
+                    setExecutiveImagePreview("");
                   }}
                 >
                   Cancel Edit
@@ -1781,7 +1950,7 @@ function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {executives.map((exec, index) => (
+                {executives.map((exec) => (
                   <tr
                     key={exec._id}
                     className="hover:bg-gray-50 transition-colors"
@@ -1790,7 +1959,7 @@ function AdminDashboard() {
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
                           <img
-                            src={`https://umuahia-blog-2.onrender.com${exec.image}`}
+                            src={exec.image}
                             alt={exec.name}
                             className="h-12 w-12 rounded-full object-cover ring-2 ring-gray-200"
                             onError={(e) => {

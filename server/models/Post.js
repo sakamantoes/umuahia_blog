@@ -32,6 +32,7 @@ const PostSchema = new mongoose.Schema(
     },
     image: {
       type: String,
+      default: null
     },
     imagePublicId: {
       type: String,

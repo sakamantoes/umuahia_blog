@@ -25,7 +25,7 @@
 //     return () => clearInterval(interval);
 //   }, []);
 
-//   const Api  = 'https://umuahia-blog-2.onrender.com/api/announcements'; // Update with your actual API URL
+//   const Api  = 'http://localhost:5000/api/announcements'; // Update with your actual API URL
 
 //   const fetchAnnouncements = async () => {
 //     try {

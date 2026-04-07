@@ -193,7 +193,7 @@ function Culture() {
                       <motion.img 
                         whileHover={{ scale: 1.05 }}
                         transition={{ duration: 0.6 }}
-                        src={`https://umuahia-blog-2.onrender.com${posts[0].image}`}
+                        src={`http://localhost:5000${posts[0].image}`}
                         className="w-full h-full bg-red-600 object-cover"
                         alt={posts[0]?.title}
                       />
@@ -305,7 +305,7 @@ function Culture() {
                         <motion.img 
                           whileHover={{ scale: 1.1 }}
                           transition={{ duration: 0.6 }}
-                          src={`https://umuahia-blog-2.onrender.com${post.image}`}
+                          src={`http://localhost:5000${post.image}`}
                           className="w-full h-56 object-cover"
                           alt={post.title}
                         />
