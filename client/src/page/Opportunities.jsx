@@ -162,7 +162,7 @@ function Opportunities() {
                     {opp.image && (
                       <div className="relative h-48 overflow-hidden">
                         <img
-                          src={`https://umuahia-blog-3.onrender.com/${opp.image}`}
+                          src={`${opp.image}`}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           alt={opp.title}
                         />

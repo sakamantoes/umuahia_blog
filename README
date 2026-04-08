@@ -154,7 +154,7 @@ JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 Frontend (.env file in /frontend directory):
 
 env
-REACT_APP_API_URL=https://umuahia-blog-3.onrender.com/
+REACT_APP_API_URL=https://umuahia-blog-2.onrender.com
 Step 4: Create Uploads Directory
 bash
 cd backend
@@ -178,7 +178,7 @@ npm start
 📚 API Documentation
 Base URL
 text
-https://umuahia-blog-3.onrender.com//api
+https://umuahia-blog-2.onrender.com/api
 Authentication Endpoints
 Method	Endpoint	Description	Auth
 POST	/auth/register	Register new user	Public
@@ -207,7 +207,7 @@ Click "Import" → "Raw Text"
 
 Paste the collection JSON from the testing guide
 
-Set environment variable: base_url = https://umuahia-blog-3.onrender.com//api
+Set environment variable: base_url = https://umuahia-blog-2.onrender.com/api
 
 Test Data
 Register a user:

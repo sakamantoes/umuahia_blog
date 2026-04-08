@@ -66,6 +66,7 @@ function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [executives, setExecutives] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isLoading, setIsloading] = useState(false)
   const [stats, setStats] = useState({});
   const [posts, setPosts] = useState([]);
   const [youths, setYouths] = useState([]);
@@ -337,6 +338,7 @@ function AdminDashboard() {
 
   const handleSubmitPost = async (e) => {
     e.preventDefault();
+    setIsloading(true);
     const token = localStorage.getItem("adminToken");
 
     // Create FormData for file upload
@@ -386,11 +388,14 @@ function AdminDashboard() {
     } catch (error) {
       console.error("Post save error:", error);
       toast.error(error.response?.data?.error || error.response?.data?.msg || "Error saving post");
+    }finally {
+      setIsloading(false);
     }
   };
 
   const handleEditPost = (post) => {
     setEditingPost(post);
+
     setFormData({
       title: post.title,
       category: post.category,
@@ -987,12 +992,13 @@ function AdminDashboard() {
           </div>
 
           <div className="flex gap-3">
+            
             <button
               type="submit"
               className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-xl font-semibold transition-all flex items-center gap-2"
             >
               {editingPost ? <Edit className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-              {editingPost ? "Update Post" : "Create Post"}
+              {isLoading ? (editingPost ? "Updating..." : "Creating...") : (editingPost ? "Update Post" : "Create Post")}
             </button>
             
             {editingPost && (

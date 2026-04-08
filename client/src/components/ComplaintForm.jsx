@@ -15,7 +15,7 @@ function ComplaintForm() {
     message: "",
   });
 
-const Api = 'https://umuahia-blog-3.onrender.com//api/complaints'; // Update with your actual API URL
+const Api = 'https://umuahia-blog-3.onrender.com/api/complaints'; // Update with your actual API URL
 
   const handleChange = (e) => {
     setFormData({

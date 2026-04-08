@@ -45,12 +45,14 @@ function Home() {
         `${Api}/api/posts/category/Opportunities?limit=1`,
       );
 
+     
+
       const news = await axios.get(
         `${Api}/api/posts/category/News%20&%20Updates?limit=1`,
       );
 
       setStats({
-        youthCount: statsRes.data.stats?.totalYouth || 0,
+       
         opportunitiesCount: opportunities.data.total || 0,
         newsCount: news.data.total || 0,
       });
@@ -75,6 +77,7 @@ function Home() {
       path: "/opportunities",
       count: stats.opportunitiesCount,
     },
+
     { name: "Lifestyle", icon: Heart, path: "/lifestyle" },
     { name: "Culture", icon: Landmark, path: "/culture" },
     { name: "Stories", icon: BookOpen, path: "/stories" },
@@ -387,6 +390,7 @@ function Home() {
           <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-tr-3xl"></div>
         </motion.div>
 
+  
       </section>
     </div>
   );

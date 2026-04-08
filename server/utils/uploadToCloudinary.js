@@ -9,4 +9,4 @@ export const uploadToCloudinary = async (fileBuffer) => {
       })
       .end(fileBuffer);
   });
-};
+};  

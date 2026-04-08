@@ -123,7 +123,7 @@ function Stories() {
                     {selectedStory.image ? (
                       <>
                         <img 
-                          src={`https://umuahia-blog-3.onrender.com/${selectedStory.image}`}
+                          src={`${selectedStory.image}`}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                           alt={selectedStory.title}
                         />
