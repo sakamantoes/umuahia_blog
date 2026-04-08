@@ -412,7 +412,7 @@ function PostDetail() {
                       <div className="flex items-start space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
                         {related.image ? (
                           <img 
-                            src={`https://umuahia-blog-3.onrender.com${related.image}`}
+                            src={`{related.image}`}
                             alt={related.title}
                             className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                           />
